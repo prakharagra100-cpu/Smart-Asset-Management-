@@ -47,11 +47,18 @@ const TransferRequests = () => {
     }
   };
 
-  const getStatusDisplay = (status, holderName = 'User 2') => {
+  const getStatusDisplay = (req, holderName = 'User 2') => {
+    const isPartial = req.approved_quantity !== null && req.approved_quantity !== undefined && req.approved_quantity < req.requested_quantity;
+    const status = req.status;
+
     switch(status) {
       case 'Pending User Approval': return { text: `Pending approval by ${holderName}`, color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: <UserCheck className="w-4 h-4 mr-1.5" /> };
-      case 'Pending Admin Approval': return { text: 'Pending approval by Admin', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: <Clock className="w-4 h-4 mr-1.5" /> };
-      case 'Completed': return { text: 'Approved & Transferred', color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircle className="w-4 h-4 mr-1.5" /> };
+      case 'Pending Admin Approval': 
+        if (isPartial) return { text: 'Partially Accepted (Pending Admin)', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: <Clock className="w-4 h-4 mr-1.5" /> };
+        return { text: 'Pending approval by Admin', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: <Clock className="w-4 h-4 mr-1.5" /> };
+      case 'Completed': 
+        if (isPartial) return { text: 'Partially Approved & Transferred', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: <CheckCircle className="w-4 h-4 mr-1.5" /> };
+        return { text: 'Approved & Transferred', color: 'bg-green-100 text-green-800 border-green-200', icon: <CheckCircle className="w-4 h-4 mr-1.5" /> };
       case 'Rejected by User': return { text: 'Rejected by User', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle className="w-4 h-4 mr-1.5" /> };
       case 'Rejected by Admin': return { text: 'Rejected by Admin', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle className="w-4 h-4 mr-1.5" /> };
       case 'Rejected': return { text: 'Rejected', color: 'bg-red-100 text-red-800 border-red-200', icon: <XCircle className="w-4 h-4 mr-1.5" /> };
@@ -140,13 +147,22 @@ const TransferRequests = () => {
           ) : (
             <div className="divide-y divide-gray-100">
               {sentRequests.map(req => {
-                const statusInfo = getStatusDisplay(req.status, req.holder_name);
+                const statusInfo = getStatusDisplay(req, req.holder_name);
                 return (
                   <div key={req.id} className="p-6 flex flex-col md:flex-row justify-between gap-6 hover:bg-slate-700/30 transition-colors w-full min-w-0">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-bold text-gray-900 truncate">{req.asset_name}</h3>
                       <p className="text-sm text-gray-600 mt-1 truncate">Current Holder: <span className="font-semibold text-gray-900">{req.holder_name}</span></p>
-                      <p className="text-sm text-gray-600 mt-1 truncate">Quantity Requested: <span className="font-semibold text-blue-600">{req.requested_quantity} unit(s)</span></p>
+                      
+                      {req.approved_quantity !== null && req.approved_quantity !== undefined && req.approved_quantity < req.requested_quantity ? (
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          Approved Quantity: <span className="font-semibold text-blue-600">{req.approved_quantity} unit(s)</span> 
+                          <span className="text-xs ml-2 text-gray-400">(Requested: {req.requested_quantity})</span>
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-600 mt-1 truncate">Quantity Requested: <span className="font-semibold text-blue-600">{req.requested_quantity} unit(s)</span></p>
+                      )}
+
                       <div className="mt-3 bg-white p-3 rounded-lg text-sm text-gray-600 border border-gray-100 break-words whitespace-pre-wrap">
                         <span className="font-semibold text-gray-700 block mb-1">Your reason:</span>
                         {req.reason}

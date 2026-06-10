@@ -158,37 +158,50 @@ const BookingRequests = () => {
                 </div>
                 <div className="min-w-0">
                   <h3 className="font-bold text-white truncate">{booking.user_name}</h3>
-                  <p className="text-sm text-slate-400 truncate">
-                    {booking.status === 'Pending' || booking.status === 'Rejected' ? 'Requested' : 'Approved'} <span className="font-semibold text-slate-300">{booking.approved_quantity || booking.requested_quantity}x {booking.asset_name}</span>
-                  </p>
-                </div>
-              </div>
-              
-              {booking.reason && (
-                <div className="mt-3 ml-13 p-3 bg-slate-900/40 rounded-lg text-sm text-slate-300 border border-slate-700/50 break-words whitespace-pre-wrap">
-                  <span className="font-semibold text-slate-400 block mb-1">Reason:</span>
-                  {booking.reason}
-                </div>
+              {booking.status === 'Pending' || booking.status === 'Rejected' ? (
+                <p className="text-sm text-slate-400 truncate">
+                  Requested <span className="font-semibold text-slate-300">{booking.requested_quantity}x {booking.asset_name}</span>
+                </p>
+              ) : (
+                <p className="text-sm text-slate-400 truncate">
+                  {booking.approved_quantity < (booking.original_requested_quantity || booking.requested_quantity) ? 'Partially Approved' : 'Approved'} <span className="font-semibold text-slate-300">{booking.approved_quantity}x {booking.asset_name}</span>
+                  {booking.approved_quantity < (booking.original_requested_quantity || booking.requested_quantity) && (
+                    <span className="text-xs ml-2 text-slate-500">(Requested: {booking.original_requested_quantity || booking.requested_quantity})</span>
+                  )}
+                </p>
               )}
             </div>
-            
-            {/* Dates */}
-            <div className="flex-1 flex flex-col justify-center gap-2 min-w-0">
-              <div className="flex items-center gap-2 text-sm text-slate-400 min-w-0">
-                <div className="w-10 font-medium text-slate-500 shrink-0">From:</div>
-                <div className="bg-slate-900/40 px-2 py-1 rounded text-slate-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex-1 border border-slate-700/30">{formatDate(booking.start_date)}</div>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-400 min-w-0">
-                <div className="w-10 font-medium text-slate-500 shrink-0">To:</div>
-                <div className="bg-slate-900/40 px-2 py-1 rounded text-slate-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex-1 border border-slate-700/30">{formatDate(booking.end_date)}</div>
-              </div>
+          </div>
+          
+          {booking.reason && (
+            <div className="mt-3 ml-13 p-3 bg-slate-900/40 rounded-lg text-sm text-slate-300 border border-slate-700/50 break-words whitespace-pre-wrap">
+              <span className="font-semibold text-slate-400 block mb-1">Reason:</span>
+              {booking.reason}
             </div>
+          )}
+        </div>
+        
+        {/* Dates */}
+        <div className="flex-1 flex flex-col justify-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 text-sm text-slate-400 min-w-0">
+            <div className="w-10 font-medium text-slate-500 shrink-0">From:</div>
+            <div className="bg-slate-900/40 px-2 py-1 rounded text-slate-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex-1 border border-slate-700/30">{formatDate(booking.start_date)}</div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-slate-400 min-w-0">
+            <div className="w-10 font-medium text-slate-500 shrink-0">To:</div>
+            <div className="bg-slate-900/40 px-2 py-1 rounded text-slate-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex-1 border border-slate-700/30">{formatDate(booking.end_date)}</div>
+          </div>
+        </div>
 
-            {/* Status & Actions */}
-            <div className="flex flex-col items-end justify-center gap-3 border-t md:border-t-0 md:border-l border-slate-700/50 pt-4 md:pt-0 md:pl-6 shrink-0 w-full md:w-48">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(booking.status)}`}>
-                {booking.status}
-              </span>
+        {/* Status & Actions */}
+        <div className="flex flex-col items-end justify-center gap-3 border-t md:border-t-0 md:border-l border-slate-700/50 pt-4 md:pt-0 md:pl-6 shrink-0 w-full md:w-48">
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+            booking.approved_quantity < (booking.original_requested_quantity || booking.requested_quantity) && booking.status === 'Approved' 
+              ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/20 text-center' 
+              : getStatusColor(booking.status)
+          }`}>
+            {booking.approved_quantity < (booking.original_requested_quantity || booking.requested_quantity) && booking.status === 'Approved' ? 'Partially Approved' : booking.status}
+          </span>
               <div className="flex flex-col gap-2 w-full">
                 {booking.status === 'Pending' && (() => {
                   const id = booking._id || booking.id;

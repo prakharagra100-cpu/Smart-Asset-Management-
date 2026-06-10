@@ -57,6 +57,23 @@ const MyBookings = () => {
     }
   };
 
+  const isPartial = (booking) => {
+    return booking.approved_quantity !== null && booking.approved_quantity !== undefined && 
+           booking.approved_quantity < (booking.original_requested_quantity || booking.requested_quantity);
+  };
+
+  const getDisplayStatus = (booking) => {
+    if (booking.status === 'Approved' && isPartial(booking)) return 'Partially Approved';
+    return booking.status;
+  };
+
+  const getBadgeColor = (booking) => {
+    if (isPartial(booking) && booking.status === 'Approved') {
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
+    return getStatusColor(booking.status);
+  };
+
   let displayedBookings = [];
   if (activeTab === 'Active') {
     displayedBookings = bookings.filter(b => ['Approved', 'Issued', 'Overdue'].includes(b.status));
@@ -128,7 +145,14 @@ const MyBookings = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-lg font-bold text-gray-900 truncate">{booking.asset_name}</h3>
-                    <p className="text-sm text-gray-500 font-medium truncate">Quantity requested: <span className="text-gray-800">{booking.requested_quantity}</span></p>
+                    {isPartial(booking) ? (
+                      <p className="text-sm text-gray-500 font-medium truncate">
+                        Approved: <span className="text-gray-800 font-bold">{booking.approved_quantity}</span> 
+                        <span className="text-xs ml-2 text-gray-400">(Requested: {booking.original_requested_quantity || booking.requested_quantity})</span>
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-500 font-medium truncate">Quantity: <span className="text-gray-800">{booking.approved_quantity || booking.requested_quantity}</span></p>
+                    )}
                   </div>
                 </div>
                 
@@ -159,9 +183,9 @@ const MyBookings = () => {
 
               <div className="flex flex-col items-end justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 shrink-0 w-full md:w-48">
                 <div className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">Current Status</div>
-                <span className={`px-4 py-2 rounded-full text-xs font-bold flex items-center border whitespace-nowrap ${getStatusColor(booking.status)}`}>
+                <span className={`px-4 py-2 rounded-full text-xs font-bold flex items-center border whitespace-nowrap ${getBadgeColor(booking)}`}>
                   {getStatusIcon(booking.status)}
-                  {booking.status}
+                  {getDisplayStatus(booking)}
                 </span>
                 {booking.status === 'Overdue' && (
                   <p className="text-xs text-red-500 mt-3 font-medium text-right break-words w-full">Please return this asset immediately.</p>
