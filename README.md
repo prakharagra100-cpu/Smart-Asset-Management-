@@ -1,4 +1,4 @@
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3d8b6ba9-e362-4990-b60c-73eacdf8bfa0" /># Smart Asset Management and Resource Allocation Platform
+# Smart Asset Management and Resource Allocation Platform
 
 Drive Link Part 1: [Drive Link part 1](https://drive.google.com/file/d/1zmxm_dVYmSN04zJX6DatbZU-vEjZO7fa/view?usp=sharing)
 Drive Link Part 2: [Drive Link part 2](https://drive.google.com/file/d/1BM8rMnLTKCTyU1b8uyOMNR1IVoZJ13Ht/view?usp=share_link)
